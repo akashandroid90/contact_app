@@ -1,3 +1,5 @@
+import 'package:contactapp/model/app_contact.dart';
+
 class ScreenConstants {
   ScreenConstants._();
 
@@ -16,4 +18,11 @@ class StringConstants {
   static const UPDATE_CONTACT = "Update Contact";
   static const FAVOURITE_CONTACTS = "Favourite Contacts";
   static const CONTACT_LIST = "Contact List";
+}
+
+class AppConstant {
+  static const showLoader = 1;
+  static const showList = 2;
+
+  static const List<AppContact> list = [];
 }

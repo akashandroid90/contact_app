@@ -78,6 +78,11 @@ class _MyHomePageState extends State<MyHomePage> {
           builder: (BuildContext context, HomeState state) {
             return Text(state.title);
           }),
+      actions: <Widget>[
+        IconButton(
+            icon: Icon(Icons.refresh),
+            onPressed: _contactBloc.fetchDeviceContacts)
+      ],
     );
   }
 
@@ -88,7 +93,10 @@ class _MyHomePageState extends State<MyHomePage> {
           return Visibility(
             visible: state.screen == ScreenConstants.CONTACT_LIST_SCREEN,
             child: FloatingActionButton(
-              onPressed: () => {},
+              onPressed: () => {
+                _homeBloc.updateData(ScreenConstants.ADD_CONTACT_SCREEN,
+                    StringConstants.ADD_CONTACT),
+              },
               tooltip: StringConstants.ADD_CONTACT,
               child: Icon(Icons.add),
             ),

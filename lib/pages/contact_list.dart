@@ -11,12 +11,12 @@ class ListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final todoList = BlocProvider.of<ContactBloc>(context).state.contactList;
-    return todoList.length > 0
+    final contactList = BlocProvider.of<ContactBloc>(context).state.contactList;
+    return contactList.length > 0
         ? ListView.builder(
-            itemCount: todoList.length,
+        itemCount: contactList.length,
             itemBuilder: (BuildContext context, int index) {
-              final contact = todoList[index];
+              final contact = contactList[index];
               return Card(
                 color: Colors.white,
                 elevation: 2.0,
@@ -25,7 +25,7 @@ class ListPage extends StatelessWidget {
                     backgroundImage: MemoryImage(contact.avatar),
                   ),
                   title: Text(
-                    contact.displayName,
+                    contact.name,
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
