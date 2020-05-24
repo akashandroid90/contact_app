@@ -14,7 +14,7 @@ class ListPage extends StatelessWidget {
     final contactList = BlocProvider.of<ContactBloc>(context).state.contactList;
     return contactList.length > 0
         ? ListView.builder(
-        itemCount: contactList.length,
+            itemCount: contactList.length,
             itemBuilder: (BuildContext context, int index) {
               final contact = contactList[index];
               return Card(

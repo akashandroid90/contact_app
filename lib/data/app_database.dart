@@ -1,7 +1,7 @@
 import 'package:contactapp/model/app_contact.dart';
 import 'package:contactapp/model/app_phone.dart';
 import 'package:contactapp/model/contact_with_phone.dart';
-import 'package:contacts_service/contacts_service.dart';
+import 'package:flutter_contact/contact.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -43,22 +43,19 @@ class AppDatabase {
   }
 
   Future<List<dynamic>> insertContacts(Iterable<Contact> list) async {
-    db.then((value) {
-      value.transaction((txn) {
-        txn
-            .delete(tblPhoneName)
-            .then((value) => txn.delete(tblName))
-            .then((value) {
-          list.forEach((element) {
-            var contact =
-                AppContact(name: element.displayName, avatar: element.avatar);
-            txn.insert(tblName, contact.toMap()).then((value) {
-              element.phones.forEach((item) {
-                var phoneContact = AppPhone(
-                    contactId: value, label: item.label, number: item.value);
-                txn.insert(tblPhoneName, phoneContact.toMap());
-              });
-            });
+    return await db.then((value) {
+      return value.transaction((txn) {
+        txn.delete(tblPhoneName);
+        txn.delete(tblName);
+
+        list.forEach((element) async {
+          var contact =
+              AppContact(name: element.displayName, avatar: element.avatar);
+          var value = await txn.insert(tblName, contact.toMap());
+          element.phones.forEach((item) {
+            var phoneContact = AppPhone(
+                contactId: value, label: item.label, number: item.value);
+            txn.insert(tblPhoneName, phoneContact.toMap());
           });
         });
         return txn.batch().commit();
@@ -67,8 +64,8 @@ class AppDatabase {
   }
 
   Future<List<AppContact>> fetchContacts() async {
-    db.then((value) {
-      value.query(tblName).then((value) {
+    return await db.then((value) {
+      return value.query(tblName).then((value) {
         return value.map((element) => AppContact.fromMap(element)).toList();
 //        final List<AppContact> list = [];
 //        value.forEach((element) {

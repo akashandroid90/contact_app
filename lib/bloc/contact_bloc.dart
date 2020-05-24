@@ -1,8 +1,8 @@
 import 'package:contactapp/constants/app_constants.dart';
 import 'package:contactapp/data/app_database.dart';
 import 'package:contactapp/state/contact_state.dart';
-import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_contact/contacts.dart';
 
 class ContactBloc extends Bloc<int, ContactState> {
   final appdatabase = AppDatabase();
@@ -23,15 +23,14 @@ class ContactBloc extends Bloc<int, ContactState> {
     super.onError(error, stackTrace);
   }
 
-  void fetchDeviceContacts() {
+  void fetchDeviceContacts() async {
     add(AppConstant.showLoader);
     // Get all contacts on device
-    ContactsService.getContacts().then((value) {
-      if (value.length > 0) {
-        appdatabase.insertContacts(value).then((value) => fetchContacts());
-      } else
-        add(AppConstant.showList);
+    await Contacts.streamContacts().forEach((contact) {
+      appdatabase.insertContacts([contact]);
     }).catchError(onError);
+    fetchContacts();
+    add(AppConstant.showList);
   }
 
   void fetchContacts() {
