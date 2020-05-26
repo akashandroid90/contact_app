@@ -42,20 +42,37 @@ class AppDatabase {
 //    await db.execute("PRAGMA foreign_keys=on");
   }
 
+  void insertContact(Contact contact) async {
+    await db.then((value) {
+//      value.delete(tblPhoneName);
+//      value.delete(tblName);
+      var data = AppContact(name: contact.displayName, avatar: contact.avatar);
+      value.insert(tblName, data.toMap()).then((rowId) {
+        contact.phones.forEach((item) {
+          var phoneContact =
+              AppPhone(contactId: rowId, label: item.label, number: item.value);
+          value.insert(tblPhoneName, phoneContact.toMap());
+        });
+      });
+    });
+    return null;
+  }
+
   Future<List<dynamic>> insertContacts(Iterable<Contact> list) async {
     return await db.then((value) {
       return value.transaction((txn) {
         txn.delete(tblPhoneName);
         txn.delete(tblName);
 
-        list.forEach((element) async {
+        list.forEach((element) {
           var contact =
               AppContact(name: element.displayName, avatar: element.avatar);
-          var value = await txn.insert(tblName, contact.toMap());
-          element.phones.forEach((item) {
-            var phoneContact = AppPhone(
-                contactId: value, label: item.label, number: item.value);
-            txn.insert(tblPhoneName, phoneContact.toMap());
+          txn.insert(tblName, contact.toMap()).then((value) {
+            element.phones.forEach((item) {
+              var phoneContact = AppPhone(
+                  contactId: value, label: item.label, number: item.value);
+              txn.insert(tblPhoneName, phoneContact.toMap());
+            });
           });
         });
         return txn.batch().commit();

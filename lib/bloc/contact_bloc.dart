@@ -27,7 +27,7 @@ class ContactBloc extends Bloc<int, ContactState> {
     add(AppConstant.showLoader);
     // Get all contacts on device
     await Contacts.streamContacts().forEach((contact) {
-      appdatabase.insertContacts([contact]);
+      appdatabase.insertContact(contact);
     }).catchError(onError);
     fetchContacts();
     add(AppConstant.showList);

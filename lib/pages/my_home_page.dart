@@ -1,6 +1,7 @@
 import 'package:contactapp/bloc/contact_bloc.dart';
 import 'package:contactapp/bloc/home_bloc.dart';
 import 'package:contactapp/constants/app_constants.dart';
+import 'package:contactapp/model/app_contact.dart';
 import 'package:contactapp/pages/add_contact.dart';
 import 'package:contactapp/pages/contact_list.dart';
 import 'package:contactapp/pages/update_contact.dart';
@@ -58,8 +59,9 @@ class _MyHomePageState extends State<MyHomePage> {
     return BlocBuilder(
         bloc: _homeBloc,
         builder: (BuildContext context, HomeState state) {
-          return state.screen == ScreenConstants.ADD_CONTACT_SCREEN
-              ? AddContactPage()
+          return state.screen == ScreenConstants.ADD_CONTACT_SCREEN ||
+                  state.screen == ScreenConstants.UPDATE_CONTACT_SCREEN
+              ? AddContactPage(AppContact())
               : state.screen == ScreenConstants.UPDATE_CONTACT_SCREEN
                   ? UpdateContactPage()
                   : BlocProvider<ContactBloc>(
