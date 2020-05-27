@@ -1,6 +1,3 @@
-import 'package:contactapp/model/app_contact.dart';
-import 'package:contactapp/model/app_phone.dart';
-
 class ScreenConstants {
   ScreenConstants._();
 
@@ -24,7 +21,6 @@ class StringConstants {
 class AppConstant {
   static const showLoader = 1;
   static const showList = 2;
-
-  static const List<AppContact> list = [];
-  static const List<AppPhone> phoneList = [];
+  static const modifyContact = 3;
+  static const modifyPhoneNumber = 4;
 }

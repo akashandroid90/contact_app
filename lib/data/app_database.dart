@@ -1,7 +1,6 @@
 import 'package:contactapp/model/app_contact.dart';
 import 'package:contactapp/model/app_phone.dart';
 import 'package:contactapp/model/contact_with_phone.dart';
-import 'package:flutter_contact/contact.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -42,42 +41,17 @@ class AppDatabase {
 //    await db.execute("PRAGMA foreign_keys=on");
   }
 
-  void insertContact(Contact contact) async {
+  void insertContact(AppContact contact) async {
     await db.then((value) {
 //      value.delete(tblPhoneName);
 //      value.delete(tblName);
-      var data = AppContact(name: contact.displayName, avatar: contact.avatar);
-      value.insert(tblName, data.toMap()).then((rowId) {
-        contact.phones.forEach((item) {
-          var phoneContact =
-              AppPhone(contactId: rowId, label: item.label, number: item.value);
-          value.insert(tblPhoneName, phoneContact.toMap());
+      value.insert(tblName, contact.toMap()).then((rowId) {
+        contact.phoneList.forEach((item) {
+          value.insert(tblPhoneName, item.toMap());
         });
       });
     });
     return null;
-  }
-
-  Future<List<dynamic>> insertContacts(Iterable<Contact> list) async {
-    return await db.then((value) {
-      return value.transaction((txn) {
-        txn.delete(tblPhoneName);
-        txn.delete(tblName);
-
-        list.forEach((element) {
-          var contact =
-              AppContact(name: element.displayName, avatar: element.avatar);
-          txn.insert(tblName, contact.toMap()).then((value) {
-            element.phones.forEach((item) {
-              var phoneContact = AppPhone(
-                  contactId: value, label: item.label, number: item.value);
-              txn.insert(tblPhoneName, phoneContact.toMap());
-            });
-          });
-        });
-        return txn.batch().commit();
-      });
-    });
   }
 
   Future<List<AppContact>> fetchContacts() async {

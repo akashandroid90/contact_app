@@ -1,27 +1,22 @@
 import 'dart:typed_data';
 
-import 'package:contactapp/constants/app_constants.dart';
 import 'package:contactapp/model/app_phone.dart';
 
 class AppContact {
   int id;
   String name;
   Uint8List avatar;
-  bool _favorite;
+  bool favorite;
   List<AppPhone> phoneList;
 
   AppContact(
-      {this.name = "",
-      this.avatar,
-      favorite = false,
-      this.phoneList = AppConstant.phoneList});
+      {this.name = "", this.avatar, this.favorite = false, this.phoneList}) {
+    phoneList = [];
+    phoneList.add(AppPhone());
+  }
 
   AppContact.withId(
-      {this.id,
-      this.name,
-      this.avatar,
-      favorite = false,
-      this.phoneList = AppConstant.phoneList});
+      {this.id, this.name, this.avatar, this.favorite = false, this.phoneList});
 
   factory AppContact.fromMap(Map<String, dynamic> map) {
     return AppContact.withId(
@@ -36,13 +31,7 @@ class AppContact {
       "id": id,
       "name": name,
       "avatar": avatar,
-      "favorite": _favorite,
+      "favorite": favorite,
     };
   }
-
-  set favorite(bool value) {
-    _favorite = value;
-  }
-
-  bool get favorite => _favorite;
 }

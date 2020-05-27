@@ -1,10 +1,8 @@
 import 'package:contactapp/bloc/contact_bloc.dart';
 import 'package:contactapp/bloc/home_bloc.dart';
 import 'package:contactapp/constants/app_constants.dart';
-import 'package:contactapp/model/app_contact.dart';
-import 'package:contactapp/pages/add_contact.dart';
+import 'package:contactapp/pages/add_or_update_contact.dart';
 import 'package:contactapp/pages/contact_list.dart';
-import 'package:contactapp/pages/update_contact.dart';
 import 'package:contactapp/state/home_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -38,8 +36,7 @@ class _MyHomePageState extends State<MyHomePage> {
           FlatButton(
               child: Text(StringConstants.ADD_CONTACT),
               onPressed: () => {
-                    _homeBloc.updateData(ScreenConstants.ADD_CONTACT_SCREEN,
-                        StringConstants.ADD_CONTACT),
+                    _openAddContactScreen(),
                     Navigator.pop(context),
                   }),
           FlatButton(
@@ -57,19 +54,16 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget _buildHomeBody() {
     return BlocBuilder(
-        bloc: _homeBloc,
-        builder: (BuildContext context, HomeState state) {
-          return state.screen == ScreenConstants.ADD_CONTACT_SCREEN ||
-                  state.screen == ScreenConstants.UPDATE_CONTACT_SCREEN
-              ? AddContactPage(AppContact())
-              : state.screen == ScreenConstants.UPDATE_CONTACT_SCREEN
-                  ? UpdateContactPage()
-                  : BlocProvider<ContactBloc>(
-                      create: (_) => _contactBloc,
-                      child: ListPage(
-                          showFav: state.screen ==
-                              ScreenConstants.FAVOURITE_CONTACT_LIST_SCREEN));
-        });
+      bloc: _homeBloc,
+      builder: (BuildContext context, HomeState state) {
+        return (state.screen == ScreenConstants.ADD_CONTACT_SCREEN ||
+            state.screen == ScreenConstants.UPDATE_CONTACT_SCREEN)
+            ? AddOrUpdateContactPage()
+            : ListPage(
+            showFav: state.screen ==
+                ScreenConstants.FAVOURITE_CONTACT_LIST_SCREEN);
+      },
+    );
   }
 
   Widget _buildAppBar() {
@@ -80,11 +74,6 @@ class _MyHomePageState extends State<MyHomePage> {
           builder: (BuildContext context, HomeState state) {
             return Text(state.title);
           }),
-      actions: <Widget>[
-        IconButton(
-            icon: Icon(Icons.refresh),
-            onPressed: _contactBloc.fetchDeviceContacts)
-      ],
     );
   }
 
@@ -95,15 +84,18 @@ class _MyHomePageState extends State<MyHomePage> {
           return Visibility(
             visible: state.screen == ScreenConstants.CONTACT_LIST_SCREEN,
             child: FloatingActionButton(
-              onPressed: () => {
-                _homeBloc.updateData(ScreenConstants.ADD_CONTACT_SCREEN,
-                    StringConstants.ADD_CONTACT),
-              },
+              onPressed: _openAddContactScreen,
               tooltip: StringConstants.ADD_CONTACT,
               child: Icon(Icons.add),
             ),
           );
         });
+  }
+
+  void _openAddContactScreen() {
+    _contactBloc.initializeSelectedContact();
+    _homeBloc.updateData(
+        ScreenConstants.ADD_CONTACT_SCREEN, StringConstants.ADD_CONTACT);
   }
 
   @override
@@ -113,7 +105,8 @@ class _MyHomePageState extends State<MyHomePage> {
       child: Scaffold(
         drawer: SafeArea(child: _buildSideDrawer()),
         appBar: _buildAppBar(),
-        body: _buildHomeBody(),
+        body: BlocProvider<ContactBloc>(
+            create: (_) => _contactBloc, child: _buildHomeBody()),
         floatingActionButton: _buildFloatingButton(),
       ),
     );
