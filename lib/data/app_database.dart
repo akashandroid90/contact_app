@@ -36,7 +36,6 @@ class AppDatabase {
         "CREATE TABLE $tblName($colId INTEGER PRIMARY KEY, $colName TEXT, $colAvatar BLOB, $colFav INTEGER default 0)");
     await db.execute(
         "CREATE TABLE $tblPhoneName($colId INTEGER PRIMARY KEY, $colLabel TEXT, $colNumber TEXT, $colContactId INTEGER)");
-//    await db.execute("PRAGMA foreign_keys=on");
   }
 
   Future<int> insertContact(AppContact contact) async {
@@ -51,9 +50,14 @@ class AppDatabase {
     return value;
   }
 
-  Future<List<AppContact>> fetchContacts() async {
+  Future<List<AppContact>> fetchContacts(bool favourites) async {
     return await db.then((value) {
-      return value.query(tblName).then((value) {
+      return value
+          .query(tblName,
+              where: favourites ? colFav + "=?" : null,
+              whereArgs: favourites ? [1] : null,
+              orderBy: colName)
+          .then((value) {
         return value.map((element) => AppContact.fromMap(element)).toList();
       });
     });
@@ -69,14 +73,15 @@ class AppDatabase {
 
   Future<int> updateContact(AppContact contact) async {
     var value = await db.then((value) async {
-      await value
-          .delete(tblPhoneName, where: colContactId, whereArgs: [contact.id]);
-      var rowId = await value.update(tblName, contact.toMap(),
-          where: colId, whereArgs: [contact.id]);
+      await value.delete(tblPhoneName,
+          where: colContactId + "=?", whereArgs: [contact.id]);
+      await value.update(tblName, contact.toMap(),
+          where: colId + "=?", whereArgs: [contact.id]);
       contact.phoneList.forEach((item) async {
+        item.contactId = contact.id;
         await value.insert(tblPhoneName, item.toMap());
       });
-      return rowId;
+      return contact.id;
     });
     return value;
   }

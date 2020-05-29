@@ -16,12 +16,6 @@ class _MyHomePageState extends State<MyHomePage> {
   final _homeBloc = HomeBloc();
   final _contactBloc = ContactBloc();
 
-  @override
-  void initState() {
-    _contactBloc.fetchContacts();
-    super.initState();
-  }
-
   Widget _buildSideDrawer() {
     return Drawer(
       child: Column(
@@ -29,8 +23,7 @@ class _MyHomePageState extends State<MyHomePage> {
           FlatButton(
               child: Text(StringConstants.All_CONTACTS),
               onPressed: () => {
-                    _homeBloc.updateData(ScreenConstants.CONTACT_LIST_SCREEN,
-                        StringConstants.CONTACT_LIST),
+                    _homeBloc.updateScreen(ScreenConstants.CONTACT_LIST_SCREEN),
                     Navigator.pop(context),
                   }),
           FlatButton(
@@ -42,9 +35,8 @@ class _MyHomePageState extends State<MyHomePage> {
           FlatButton(
               child: Text(StringConstants.FAVOURITE_CONTACTS),
               onPressed: () => {
-                    _homeBloc.updateData(
-                        ScreenConstants.FAVOURITE_CONTACT_LIST_SCREEN,
-                        StringConstants.FAVOURITE_CONTACTS),
+                _homeBloc.updateScreen(
+                    ScreenConstants.FAVOURITE_CONTACT_LIST_SCREEN),
                     Navigator.pop(context),
                   })
         ],
@@ -59,7 +51,7 @@ class _MyHomePageState extends State<MyHomePage> {
         return (state.screen == ScreenConstants.ADD_CONTACT_SCREEN ||
             state.screen == ScreenConstants.UPDATE_CONTACT_SCREEN)
             ? AddOrUpdateContactPage()
-            : ListPage(
+            : ContactListPage(
             showFav: state.screen ==
                 ScreenConstants.FAVOURITE_CONTACT_LIST_SCREEN);
       },
@@ -72,7 +64,13 @@ class _MyHomePageState extends State<MyHomePage> {
       title: BlocBuilder(
           bloc: _homeBloc,
           builder: (BuildContext context, HomeState state) {
-            return Text(state.title);
+            return Text(state.screen == ScreenConstants.ADD_CONTACT_SCREEN
+                ? StringConstants.ADD_CONTACT
+                : state.screen == ScreenConstants.UPDATE_CONTACT_SCREEN
+                ? StringConstants.UPDATE_CONTACT
+                : state.screen == ScreenConstants.CONTACT_LIST_SCREEN
+                ? StringConstants.CONTACT_LIST
+                : StringConstants.FAVOURITE_CONTACTS);
           }),
     );
   }
@@ -94,8 +92,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _openAddContactScreen() {
     _contactBloc.initializeSelectedContact();
-    _homeBloc.updateData(
-        ScreenConstants.ADD_CONTACT_SCREEN, StringConstants.ADD_CONTACT);
+    _homeBloc.updateScreen(ScreenConstants.ADD_CONTACT_SCREEN);
   }
 
   @override

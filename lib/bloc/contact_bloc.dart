@@ -16,24 +16,24 @@ class ContactBloc extends Bloc<int, ContactState> {
     if (event == AppConstant.showLoader)
       yield ContactState(
           showLoader: true,
-          contactList: state.contactList,
+//          contactList: state.contactList,
           selectedContact: state.selectedContact);
     else if (event == AppConstant.showList)
       yield ContactState(
           showLoader: false,
-          contactList: state.contactList,
+//          contactList: state.contactList,
           selectedContact: state.selectedContact);
     else if (event == AppConstant.modifyContact)
       yield ContactState(
           showLoader: state.showLoader,
-          contactList: state.contactList,
+//          contactList: state.contactList,
           selectedContact: state.selectedContact);
     else if (event == AppConstant.modifyPhoneNumber)
       state.selectedContact.phoneList =
           List.from(state.selectedContact.phoneList);
     yield ContactState(
         showLoader: state.showLoader,
-        contactList: state.contactList,
+//        contactList: state.contactList,
         selectedContact: state.selectedContact);
   }
 
@@ -67,23 +67,23 @@ class ContactBloc extends Bloc<int, ContactState> {
 
   //Database Operations
 
-  Future<bool> fetchContacts() async {
+  Future<List<AppContact>> fetchContacts(bool favourites) async {
     add(AppConstant.showLoader);
-    var value = await _appDatabase.fetchContacts().then((value) {
-      if (value != null) state.contactList = value;
-      return true;
+    var value = await _appDatabase.fetchContacts(favourites).then((value) {
+//      if (value != null) state.contactList = value;
+      return value;
     }).catchError(onError);
     add(AppConstant.showList);
     return value;
   }
 
-  Future<bool> insetOrUpdateContactInDb() async {
+  Future<int> insetOrUpdateContactInDb() async {
     add(AppConstant.showLoader);
     var value = await (state.selectedContact.id == null
             ? _appDatabase.insertContact(state.selectedContact)
             : _appDatabase.updateContact(state.selectedContact))
-        .then((_) async {
-      return await fetchContacts();
+        .then((value) async {
+      return value;
     }).catchError(onError);
     return value;
   }

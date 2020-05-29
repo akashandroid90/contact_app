@@ -8,7 +8,10 @@ class ScreenMessage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Text(message),
+      child: Text(
+        message,
+        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0),
+      ),
     );
   }
 }
