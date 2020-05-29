@@ -39,8 +39,7 @@ class ListPage extends StatelessWidget {
                     contact.name,
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
-                  onTap: () =>
-                  {
+                  onTap: () => {
                     BlocProvider.of<ContactBloc>(context)
                         .setSelectedContact(contact),
                     BlocProvider.of<HomeBloc>(context).updateData(
