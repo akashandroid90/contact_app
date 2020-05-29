@@ -6,7 +6,7 @@ import 'package:contactapp/state/contact_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ContactBloc extends Bloc<int, ContactState> {
-  final appdatabase = AppDatabase();
+  final _appDatabase = AppDatabase();
 
   @override
   get initialState => ContactState();
@@ -42,14 +42,6 @@ class ContactBloc extends Bloc<int, ContactState> {
     super.onError(error, stackTrace);
   }
 
-  void fetchContacts() {
-    add(AppConstant.showLoader);
-    appdatabase.fetchContacts().then((value) {
-      if (value != null) state.contactList = value;
-      add(AppConstant.showList);
-    }).catchError(onError);
-  }
-
   void addPhoneNumber() {
     state.selectedContact.phoneList.add(AppPhone());
     add(AppConstant.modifyPhoneNumber);
@@ -71,5 +63,39 @@ class ContactBloc extends Bloc<int, ContactState> {
 
   void setSelectedContact(AppContact contact) {
     state.selectedContact = contact;
+  }
+
+  //Database Operations
+
+  Future<bool> fetchContacts() async {
+    add(AppConstant.showLoader);
+    var value = await _appDatabase.fetchContacts().then((value) {
+      if (value != null) state.contactList = value;
+      return true;
+    }).catchError(onError);
+    add(AppConstant.showList);
+    return value;
+  }
+
+  Future<bool> insetOrUpdateContactInDb() async {
+    add(AppConstant.showLoader);
+    var value = await (state.selectedContact.id == null
+            ? _appDatabase.insertContact(state.selectedContact)
+            : _appDatabase.updateContact(state.selectedContact))
+        .then((_) async {
+      return await fetchContacts();
+    }).catchError(onError);
+    return value;
+  }
+
+  Future<void> fetchContactNumbers() async {
+    add(AppConstant.showLoader);
+    if (state.selectedContact.id != null &&
+        (state.selectedContact.phoneList == null ||
+            state.selectedContact.phoneList.isEmpty)) {
+      var list =
+          await _appDatabase.fetchContactNumbers(state.selectedContact.id);
+      state.selectedContact.phoneList = list;
+    }
   }
 }

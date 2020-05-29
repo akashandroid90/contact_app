@@ -6,5 +6,7 @@ class ContactState {
   AppContact selectedContact;
 
   ContactState(
-      {this.showLoader = false, this.contactList, this.selectedContact});
+      {this.showLoader = false, this.contactList, this.selectedContact}) {
+    if (contactList == null) contactList = [];
+  }
 }

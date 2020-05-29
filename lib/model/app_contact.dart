@@ -23,7 +23,7 @@ class AppContact {
         id: map["id"],
         name: map["name"],
         avatar: map["avatar"],
-        favorite: map["favorite"]);
+        favorite: map["favorite"] == 1 ? true : false);
   }
 
   Map<String, dynamic> toMap() {
@@ -31,7 +31,7 @@ class AppContact {
       "id": id,
       "name": name,
       "avatar": avatar,
-      "favorite": favorite,
+      "favorite": favorite ? 1 : 0,
     };
   }
 }

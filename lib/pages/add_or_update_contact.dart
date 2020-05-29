@@ -1,4 +1,6 @@
 import 'package:contactapp/bloc/contact_bloc.dart';
+import 'package:contactapp/bloc/home_bloc.dart';
+import 'package:contactapp/constants/app_constants.dart';
 import 'package:contactapp/model/app_phone.dart';
 import 'package:contactapp/state/contact_state.dart';
 import 'package:flutter/material.dart';
@@ -51,6 +53,7 @@ class AddOrUpdateContactPage extends StatelessWidget {
       bloc: _contactBloc,
       builder: (BuildContext context, ContactState state) {
         return TextFormField(
+          initialValue: _contactBloc.state.selectedContact.name,
           decoration: InputDecoration(
               labelText: 'Name', filled: true, fillColor: Colors.white),
           keyboardType: TextInputType.text,
@@ -123,9 +126,13 @@ class AddOrUpdateContactPage extends StatelessWidget {
         });
   }
 
-  void _addOrUpdateContact() {
+  void _addOrUpdateContact(BuildContext context) {
     if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
+      _contactBloc.insetOrUpdateContactInDb().then((_) {
+        BlocProvider.of<HomeBloc>(context)
+            .updateScreen(ScreenConstants.CONTACT_LIST_SCREEN);
+      });
     }
   }
 
@@ -170,9 +177,7 @@ class AddOrUpdateContactPage extends StatelessWidget {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    _contactBloc = BlocProvider.of<ContactBloc>(context);
+  Widget _buildBodyUi(BuildContext context) {
     return Padding(
       padding: EdgeInsets.all(10.0),
       child: Container(
@@ -195,11 +200,22 @@ class AddOrUpdateContactPage extends StatelessWidget {
               ),
               _buildPhoneNumber(),
               RaisedButton(
-                  onPressed: _addOrUpdateContact, child: Text("Submit"))
+                  onPressed: () => _addOrUpdateContact(context),
+                  child: Text("Submit"))
             ],
           ),
         ),
       ),
     );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    _contactBloc = BlocProvider.of<ContactBloc>(context);
+    return FutureBuilder(
+        future: _contactBloc.fetchContactNumbers(),
+        builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
+          return _buildBodyUi(context);
+        });
   }
 }

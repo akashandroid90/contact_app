@@ -1,6 +1,5 @@
 import 'package:contactapp/model/app_contact.dart';
 import 'package:contactapp/model/app_phone.dart';
-import 'package:contactapp/model/contact_with_phone.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -13,7 +12,7 @@ class AppDatabase {
   String colNumber = "number";
   String colContactId = "contactId";
   String colAvatar = "avatar";
-  String colFav = "fav";
+  String colFav = "favorite";
 
   AppDatabase._();
 
@@ -34,73 +33,51 @@ class AppDatabase {
 
   void _createDb(Database db, int newVersion) async {
     await db.execute(
-        "CREATE TABLE $tblName($colId INTEGER PRIMARY KEY, $colName TEXT, $colAvatar BLOB, $colFav BOOLEAN)");
+        "CREATE TABLE $tblName($colId INTEGER PRIMARY KEY, $colName TEXT, $colAvatar BLOB, $colFav INTEGER default 0)");
     await db.execute(
-        "CREATE TABLE $tblPhoneName($colId INTEGER PRIMARY KEY, $colLabel TEXT, $colNumber TEXT, $colContactId INTEGER,"
-        " constraint fk_contact_id foreign key($colContactId) references $tblName($colId))");
+        "CREATE TABLE $tblPhoneName($colId INTEGER PRIMARY KEY, $colLabel TEXT, $colNumber TEXT, $colContactId INTEGER)");
 //    await db.execute("PRAGMA foreign_keys=on");
   }
 
-  void insertContact(AppContact contact) async {
-    await db.then((value) {
-//      value.delete(tblPhoneName);
-//      value.delete(tblName);
-      value.insert(tblName, contact.toMap()).then((rowId) {
-        contact.phoneList.forEach((item) {
-          value.insert(tblPhoneName, item.toMap());
-        });
+  Future<int> insertContact(AppContact contact) async {
+    var value = await db.then((value) async {
+      var rowId = await value.insert(tblName, contact.toMap());
+      contact.phoneList.forEach((item) async {
+        item.contactId = rowId;
+        await value.insert(tblPhoneName, item.toMap());
       });
+      return rowId;
     });
-    return null;
+    return value;
   }
 
   Future<List<AppContact>> fetchContacts() async {
     return await db.then((value) {
       return value.query(tblName).then((value) {
         return value.map((element) => AppContact.fromMap(element)).toList();
-//        final List<AppContact> list = [];
-//        value.forEach((element) {
-//          list.add(AppContact.fromMap(element));
-//        });
-//        return list;
       });
     });
   }
 
-  List<AppPhone> fetchContactWithNumber(int columnId) {
-    db.then((value) {
-      value.query(tblPhoneName,
-          where: colContactId, whereArgs: [columnId]).then((value) {
-        final List<AppPhone> list = [];
-        value.forEach((element) {
-          list.add(AppPhone.fromMap(element));
-        });
-        return list;
-      });
+  Future<List<AppPhone>> fetchContactNumbers(int rowId) async {
+    return await db.then((value) async {
+      var query = await value
+          .query(tblPhoneName, where: colContactId + "=?", whereArgs: [rowId]);
+      return query.map((element) => AppPhone.fromMap(element)).toList();
     });
   }
 
-  Future<List<dynamic>> updateContact(ContactWithPhone data) {
-    db.then((value) {
-      value.transaction((txn) {
-        txn.delete(tblPhoneName,
-            where: colContactId, whereArgs: [data.id]).then((value) {
-          var contact = AppContact.withId(
-              id: data.id,
-              name: data.name,
-              avatar: data.avatar,
-              favorite: data.favorite);
-          txn.update(tblName, contact.toMap(),
-              where: colId, whereArgs: [data.id]).then((value) {
-            data.phoneNumber.forEach((item) {
-              var phoneContact = AppPhone(
-                  contactId: data.id, label: item.label, number: item.number);
-              txn.insert(tblPhoneName, phoneContact.toMap());
-            });
-          });
-        });
-        return txn.batch().commit();
+  Future<int> updateContact(AppContact contact) async {
+    var value = await db.then((value) async {
+      await value
+          .delete(tblPhoneName, where: colContactId, whereArgs: [contact.id]);
+      var rowId = await value.update(tblName, contact.toMap(),
+          where: colId, whereArgs: [contact.id]);
+      contact.phoneList.forEach((item) async {
+        await value.insert(tblPhoneName, item.toMap());
       });
+      return rowId;
     });
+    return value;
   }
 }
