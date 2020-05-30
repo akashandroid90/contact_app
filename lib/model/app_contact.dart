@@ -1,11 +1,9 @@
-import 'dart:typed_data';
-
 import 'package:contactapp/model/app_phone.dart';
 
 class AppContact {
   int id;
   String name;
-  Uint8List avatar;
+  String avatar;
   bool favorite;
   List<AppPhone> phoneList;
 

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:contactapp/bloc/contact_bloc.dart';
 import 'package:contactapp/bloc/home_bloc.dart';
 import 'package:contactapp/constants/app_constants.dart';
@@ -5,12 +7,44 @@ import 'package:contactapp/model/app_phone.dart';
 import 'package:contactapp/state/contact_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 
 class AddOrUpdateContactPage extends StatelessWidget {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   ContactBloc _contactBloc;
 
-  Widget _buildAvatarImage() {
+  void _openImagePicker(BuildContext context) {
+    showModalBottomSheet(
+        context: context,
+        builder: (BuildContext context) {
+          return Container(
+            padding: EdgeInsets.all(10.0),
+            height: 120,
+            child: Column(
+              children: <Widget>[
+                FlatButton(
+                    onPressed: () => _contactBloc
+                        .getImage(ImageSource.gallery)
+                        .then((value) => Navigator.pop(context)),
+                    child: Text(
+                      "Gallery",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    )),
+                FlatButton(
+                    onPressed: () => _contactBloc
+                        .getImage(ImageSource.camera)
+                        .then((value) => Navigator.pop(context)),
+                    child: Text(
+                      "Camera",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    )),
+              ],
+            ),
+          );
+        });
+  }
+
+  Widget _buildAvatarImage(BuildContext context) {
     return BlocBuilder(
         bloc: _contactBloc,
         builder: (BuildContext context, ContactState state) {
@@ -21,12 +55,14 @@ class AddOrUpdateContactPage extends StatelessWidget {
                 height: 100,
                 child: CircleAvatar(
                   backgroundColor: Colors.white,
-                  child: Icon(
+                  backgroundImage: state.selectedContact.avatar != null
+                      ? FileImage(File(state.selectedContact.avatar))
+                      : null,
+                  child: state.selectedContact.avatar == null
+                      ? Icon(
                     Icons.account_circle,
                     size: 100,
-                  ),
-                  backgroundImage: state.selectedContact.avatar != null
-                      ? MemoryImage(state.selectedContact.avatar)
+                  )
                       : null,
                 ),
               ),
@@ -40,7 +76,7 @@ class AddOrUpdateContactPage extends StatelessWidget {
                         Icons.camera_alt,
                         color: Colors.black,
                       ),
-                      onPressed: () => {}),
+                      onPressed: () => _openImagePicker(context)),
                 ),
               )
             ],
@@ -154,7 +190,7 @@ class AddOrUpdateContactPage extends StatelessWidget {
                     child: Container(
                       margin: EdgeInsets.only(bottom: 20.0),
                       child:
-                          _buildLabel(state.selectedContact.phoneList[index]),
+                      _buildLabel(state.selectedContact.phoneList[index]),
                     ),
                   ),
                   SizedBox(
@@ -186,7 +222,7 @@ class AddOrUpdateContactPage extends StatelessWidget {
           key: _formKey,
           child: Column(
             children: <Widget>[
-              _buildAvatarImage(),
+              _buildAvatarImage(context),
               SizedBox(
                 height: 10.0,
               ),

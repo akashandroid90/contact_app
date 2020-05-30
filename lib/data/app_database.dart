@@ -33,7 +33,7 @@ class AppDatabase {
 
   void _createDb(Database db, int newVersion) async {
     await db.execute(
-        "CREATE TABLE $tblName($colId INTEGER PRIMARY KEY, $colName TEXT, $colAvatar BLOB, $colFav INTEGER default 0)");
+        "CREATE TABLE $tblName($colId INTEGER PRIMARY KEY, $colName TEXT, $colAvatar TEXT, $colFav INTEGER default 0)");
     await db.execute(
         "CREATE TABLE $tblPhoneName($colId INTEGER PRIMARY KEY, $colLabel TEXT, $colNumber TEXT, $colContactId INTEGER)");
   }

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:contactapp/bloc/contact_bloc.dart';
 import 'package:contactapp/bloc/home_bloc.dart';
 import 'package:contactapp/constants/app_constants.dart';
@@ -23,14 +25,15 @@ class ContactListPage extends StatelessWidget {
             elevation: 2.0,
             child: ListTile(
               leading: CircleAvatar(
-                backgroundImage:
-                    contact.avatar != null ? MemoryImage(contact.avatar) : null,
+                backgroundImage: contact.avatar != null
+                    ? FileImage(File(contact.avatar))
+                    : null,
                 child: contact.avatar == null
                     ? Text(
-                        contact.name.substring(0, 1).toUpperCase(),
-                        style: TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.bold),
-                      )
+                  contact.name.substring(0, 1).toUpperCase(),
+                  style: TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.bold),
+                )
                     : null,
               ),
               title: Text(
@@ -66,8 +69,8 @@ class ContactListPage extends StatelessWidget {
                 AsyncSnapshot<List<AppContact>> snapshot) {
               return snapshot.hasData
                   ? snapshot.data.isEmpty
-                      ? _buildMessage()
-                      : _buildListView(snapshot.data)
+                  ? _buildMessage()
+                  : _buildListView(snapshot.data)
                   : _buildMessage();
             }),
         BlocBuilder(

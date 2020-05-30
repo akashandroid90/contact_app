@@ -4,6 +4,7 @@ import 'package:contactapp/model/app_contact.dart';
 import 'package:contactapp/model/app_phone.dart';
 import 'package:contactapp/state/contact_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 
 class ContactBloc extends Bloc<int, ContactState> {
   final _appDatabase = AppDatabase();
@@ -63,6 +64,13 @@ class ContactBloc extends Bloc<int, ContactState> {
 
   void setSelectedContact(AppContact contact) {
     state.selectedContact = contact;
+  }
+
+  Future<void> getImage(ImageSource source) async {
+    return await ImagePicker().getImage(source: source).then((value) {
+      state.selectedContact.avatar = value.path;
+      add(AppConstant.modifyContact);
+    });
   }
 
   //Database Operations
