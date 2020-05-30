@@ -60,9 +60,9 @@ class AddOrUpdateContactPage extends StatelessWidget {
                       : null,
                   child: state.selectedContact.avatar == null
                       ? Icon(
-                    Icons.account_circle,
-                    size: 100,
-                  )
+                          Icons.account_circle,
+                          size: 100,
+                        )
                       : null,
                 ),
               ),

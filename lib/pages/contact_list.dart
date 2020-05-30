@@ -30,10 +30,10 @@ class ContactListPage extends StatelessWidget {
                     : null,
                 child: contact.avatar == null
                     ? Text(
-                  contact.name.substring(0, 1).toUpperCase(),
-                  style: TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.bold),
-                )
+                        contact.name.substring(0, 1).toUpperCase(),
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold),
+                      )
                     : null,
               ),
               title: Text(
