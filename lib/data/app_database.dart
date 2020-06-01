@@ -50,6 +50,15 @@ class AppDatabase {
     return value;
   }
 
+  Future<AppContact> fetchContact(int id) async {
+    return await db.then((value) async {
+      return await value
+          .query(tblName, where: colId + "=?", whereArgs: [id]).then((value) {
+        return value.map((element) => AppContact.fromMap(element)).first;
+      });
+    });
+  }
+
   Future<List<AppContact>> fetchContacts(bool favourites) async {
     return await db.then((value) {
       return value

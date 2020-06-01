@@ -5,6 +5,7 @@ import 'package:contactapp/bloc/home_bloc.dart';
 import 'package:contactapp/constants/app_constants.dart';
 import 'package:contactapp/model/app_contact.dart';
 import 'package:contactapp/state/contact_state.dart';
+import 'package:contactapp/state/home_state.dart';
 import 'package:contactapp/widget/screen_message.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -42,10 +43,8 @@ class ContactListPage extends StatelessWidget {
               ),
               trailing: contact.favorite ? Icon(Icons.favorite) : null,
               onTap: () => {
-                BlocProvider.of<ContactBloc>(context)
-                    .setSelectedContact(contact),
-                BlocProvider.of<HomeBloc>(context)
-                    .updateScreen(ScreenConstants.UPDATE_CONTACT_SCREEN)
+                Navigator.pushNamed<bool>(
+                    context, "/update_contact/${contact.id}")
               },
             ),
           );
@@ -64,31 +63,95 @@ class ContactListPage extends StatelessWidget {
         });
   }
 
+  Widget _buildSideDrawer(BuildContext context) {
+    return Drawer(
+      child: Column(
+        children: <Widget>[
+          Container(
+            width: double.infinity,
+            child: FlatButton(
+                child: Text(StringConstants.All_CONTACTS),
+                onPressed: () => {
+                      Navigator.pushNamedAndRemoveUntil(
+                          context, "/", ModalRoute.withName('/')),
+                    }),
+          ),
+          Container(
+            width: double.infinity,
+            child: FlatButton(
+                child: Text(StringConstants.ADD_CONTACT),
+                onPressed: () => {
+                      Navigator.pop(context),
+                      Navigator.pushNamed(context, "/add_contact"),
+                    }),
+          ),
+          Container(
+            width: double.infinity,
+            child: FlatButton(
+                child: Text(StringConstants.FAVOURITE_CONTACTS),
+                onPressed: () => {
+                      Navigator.pushNamedAndRemoveUntil(context,
+                          "/favourite_contact_list", ModalRoute.withName('/')),
+                    }),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAppBar(BuildContext context) {
+    return AppBar(
+      centerTitle: true,
+      title: BlocBuilder(
+          bloc: BlocProvider.of<HomeBloc>(context),
+          builder: (BuildContext context, HomeState state) {
+            return Text(showFav
+                ? StringConstants.FAVOURITE_CONTACTS
+                : StringConstants.CONTACT_LIST);
+          }),
+    );
+  }
+
+  Widget _buildFloatingButton(BuildContext context) {
+    return BlocBuilder(
+        bloc: BlocProvider.of<HomeBloc>(context),
+        builder: (BuildContext context, HomeState state) {
+          return FloatingActionButton(
+            onPressed: () => Navigator.pushNamed(context, "/add_contact")
+                .then((value) => null),
+            tooltip: StringConstants.ADD_CONTACT,
+            child: Icon(Icons.add),
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     _contactBloc = BlocProvider.of<ContactBloc>(context);
-    return Stack(
-      children: <Widget>[
-        FutureBuilder<List<AppContact>>(
-            future: _contactBloc.fetchContacts(showFav),
-            builder: (BuildContext context,
-                AsyncSnapshot<List<AppContact>> snapshot) {
-              return snapshot.hasData
-                  ? snapshot.data.isEmpty
+    return Scaffold(
+      drawer: SafeArea(child: _buildSideDrawer(context)),
+      appBar: _buildAppBar(context),
+      body: Stack(
+        children: <Widget>[
+          FutureBuilder<List<AppContact>>(
+              future: _contactBloc.fetchContacts(showFav),
+              builder: (BuildContext context,
+                  AsyncSnapshot<List<AppContact>> snapshot) {
+                if (snapshot.connectionState != ConnectionState.done) {
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                } else {
+                  return snapshot.hasData
+                      ? snapshot.data.isEmpty
                       ? _buildMessage()
                       : _buildListView(snapshot.data)
-                  : _buildMessage();
-            }),
-        BlocBuilder(
-            bloc: _contactBloc,
-            builder: (BuildContext context, ContactState state) {
-              return Visibility(
-                  visible: state.showLoader,
-                  child: Center(
-                    child: CircularProgressIndicator(),
-                  ));
-            })
-      ],
+                      : _buildMessage();
+                }
+              }),
+        ],
+      ),
+      floatingActionButton: _buildFloatingButton(context),
     );
   }
 }

@@ -9,8 +9,7 @@ class AppContact {
 
   AppContact(
       {this.name = "", this.avatar, this.favorite = false, this.phoneList}) {
-    phoneList = [];
-    phoneList.add(AppPhone());
+    if (phoneList != null) phoneList.add(AppPhone());
   }
 
   AppContact.withId(

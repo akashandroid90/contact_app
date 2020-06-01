@@ -16,26 +16,18 @@ class ContactBloc extends Bloc<int, ContactState> {
   Stream<ContactState> mapEventToState(event) async* {
     if (event == AppConstant.showLoader)
       yield ContactState(
-          showLoader: true,
-//          contactList: state.contactList,
-          selectedContact: state.selectedContact);
+          showLoader: true, selectedContact: state.selectedContact);
     else if (event == AppConstant.showList)
       yield ContactState(
-          showLoader: false,
-//          contactList: state.contactList,
-          selectedContact: state.selectedContact);
+          showLoader: false, selectedContact: state.selectedContact);
     else if (event == AppConstant.modifyContact)
       yield ContactState(
-          showLoader: state.showLoader,
-//          contactList: state.contactList,
-          selectedContact: state.selectedContact);
+          showLoader: state.showLoader, selectedContact: state.selectedContact);
     else if (event == AppConstant.modifyPhoneNumber)
       state.selectedContact.phoneList =
           List.from(state.selectedContact.phoneList);
     yield ContactState(
-        showLoader: state.showLoader,
-//        contactList: state.contactList,
-        selectedContact: state.selectedContact);
+        showLoader: state.showLoader, selectedContact: state.selectedContact);
   }
 
   @override
@@ -58,8 +50,8 @@ class ContactBloc extends Bloc<int, ContactState> {
     add(AppConstant.modifyContact);
   }
 
-  void initializeSelectedContact() {
-    state.selectedContact = AppContact();
+  void initializeSelectedContact({List<AppPhone> list}) {
+    state.selectedContact = AppContact(phoneList: list);
   }
 
   void setSelectedContact(AppContact contact) {
@@ -98,12 +90,18 @@ class ContactBloc extends Bloc<int, ContactState> {
 
   Future<void> fetchContactNumbers() async {
     add(AppConstant.showLoader);
+    if (state.selectedContact.id != null) {
+      await _appDatabase
+          .fetchContact(state.selectedContact.id)
+          .then((value) => state.selectedContact = value);
+    }
     if (state.selectedContact.id != null &&
         (state.selectedContact.phoneList == null ||
             state.selectedContact.phoneList.isEmpty)) {
       var list =
           await _appDatabase.fetchContactNumbers(state.selectedContact.id);
       state.selectedContact.phoneList = list;
+      add(AppConstant.modifyContact);
     }
   }
 }

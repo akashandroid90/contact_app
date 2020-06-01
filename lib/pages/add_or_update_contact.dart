@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:contactapp/bloc/contact_bloc.dart';
-import 'package:contactapp/bloc/home_bloc.dart';
 import 'package:contactapp/constants/app_constants.dart';
 import 'package:contactapp/model/app_phone.dart';
 import 'package:contactapp/state/contact_state.dart';
@@ -91,23 +90,18 @@ class AddOrUpdateContactPage extends StatelessWidget {
   }
 
   Widget _buildNameField() {
-    return BlocBuilder(
-      bloc: _contactBloc,
-      builder: (BuildContext context, ContactState state) {
-        return TextFormField(
-          initialValue: _contactBloc.state.selectedContact.name,
-          decoration: InputDecoration(
-              labelText: StringConstants.NAME,
-              filled: true,
-              fillColor: Colors.white),
-          keyboardType: TextInputType.text,
-          validator: (String value) {
-            return value.isEmpty ? StringConstants.PLEASE_ENTER_NAME : null;
-          },
-          onSaved: (String value) {
-            state.selectedContact.name = value;
-          },
-        );
+    return TextFormField(
+      initialValue: _contactBloc.state.selectedContact.name,
+      decoration: InputDecoration(
+          labelText: StringConstants.NAME,
+          filled: true,
+          fillColor: Colors.white),
+      keyboardType: TextInputType.text,
+      validator: (String value) {
+        return value.isEmpty ? StringConstants.PLEASE_ENTER_NAME : null;
+      },
+      onSaved: (String value) {
+        _contactBloc.state.selectedContact.name = value;
       },
     );
   }
@@ -178,8 +172,7 @@ class AddOrUpdateContactPage extends StatelessWidget {
     if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
       _contactBloc.insetOrUpdateContactInDb().then((_) {
-        BlocProvider.of<HomeBloc>(context)
-            .updateScreen(ScreenConstants.CONTACT_LIST_SCREEN);
+        Navigator.pop(context);
       });
     }
   }
@@ -202,7 +195,7 @@ class AddOrUpdateContactPage extends StatelessWidget {
                     child: Container(
                       margin: EdgeInsets.only(bottom: 20.0),
                       child:
-                      _buildLabel(state.selectedContact.phoneList[index]),
+                          _buildLabel(state.selectedContact.phoneList[index]),
                     ),
                   ),
                   SizedBox(
@@ -263,10 +256,21 @@ class AddOrUpdateContactPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     _contactBloc = BlocProvider.of<ContactBloc>(context);
-    return FutureBuilder(
-        future: _contactBloc.fetchContactNumbers(),
-        builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
-          return _buildBodyUi(context);
-        });
+    return Scaffold(
+      appBar: AppBar(
+        centerTitle: true,
+        title: Text(StringConstants.ADD_CONTACT),
+      ),
+      body: FutureBuilder(
+          future: _contactBloc.fetchContactNumbers(),
+          builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
+            if (snapshot.connectionState != ConnectionState.done)
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            else
+              return _buildBodyUi(context);
+          }),
+    );
   }
 }

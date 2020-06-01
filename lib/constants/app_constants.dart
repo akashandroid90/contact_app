@@ -11,6 +11,7 @@ class ScreenConstants {
 class StringConstants {
   StringConstants._();
 
+  static const APP_NAME = "Contact App";
   static const All_CONTACTS = "All Contacts";
   static const ADD_CONTACT = "Add Contact";
   static const UPDATE_CONTACT = "Update Contact";
