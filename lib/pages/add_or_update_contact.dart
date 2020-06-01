@@ -24,9 +24,10 @@ class AddOrUpdateContactPage extends StatelessWidget {
                 Container(
                   width: double.infinity,
                   child: FlatButton(
-                      onPressed: () => _contactBloc
-                          .getImage(ImageSource.gallery)
-                          .then((value) => Navigator.pop(context)),
+                      onPressed: () => {
+                            Navigator.pop(context),
+                            _contactBloc.getImage(ImageSource.gallery)
+                          },
                       child: Text(
                         StringConstants.GALLERY,
                         style: TextStyle(fontWeight: FontWeight.bold),
@@ -35,9 +36,11 @@ class AddOrUpdateContactPage extends StatelessWidget {
                 Container(
                   width: double.infinity,
                   child: FlatButton(
-                      onPressed: () => _contactBloc
-                          .getImage(ImageSource.camera)
-                          .then((value) => Navigator.pop(context)),
+                      onPressed: () =>
+                      {
+                        Navigator.pop(context),
+                        _contactBloc.getImage(ImageSource.camera)
+                      },
                       child: Text(
                         StringConstants.CAMERA,
                         style: TextStyle(fontWeight: FontWeight.bold),
