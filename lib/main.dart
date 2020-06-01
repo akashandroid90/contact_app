@@ -1,5 +1,4 @@
 import 'package:contactapp/bloc/contact_bloc.dart';
-import 'package:contactapp/bloc/home_bloc.dart';
 import 'package:contactapp/constants/app_constants.dart';
 import 'package:contactapp/pages/add_or_update_contact.dart';
 import 'package:contactapp/pages/contact_list.dart';
@@ -18,63 +17,67 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyApp extends State<MyApp> {
-  final _homeBloc = HomeBloc();
   final _contactBloc = ContactBloc();
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<HomeBloc>(
-      create: (_) => _homeBloc,
-      child: BlocProvider(
-        create: (_) => _contactBloc,
-        child: MaterialApp(
-          title: StringConstants.APP_NAME,
-          theme: ThemeData(
-            primarySwatch: Colors.blue,
-            visualDensity: VisualDensity.adaptivePlatformDensity,
-          ),
-//      home: MyHomePage(),
-          routes: {
-            "/": (BuildContext context) => ContactListPage(),
-          },
-          onGenerateRoute: (RouteSettings settings) {
-            final List<String> pathElements = settings.name.split('/');
-            if (pathElements[0] != '') {
-              return null;
-            }
-            if (pathElements[1] == "add_contact") {
-              _contactBloc.initializeSelectedContact(list: []);
-              return MaterialPageRoute<bool>(
-                settings: settings,
-                builder: (BuildContext context) => AddOrUpdateContactPage(),
-              );
-            } else if (pathElements[1] == "update_contact") {
-              _contactBloc.initializeSelectedContact();
-              _contactBloc.state.selectedContact.id =
-                  int.parse(pathElements[2]);
-              return MaterialPageRoute<bool>(
-                settings: settings,
-                builder: (BuildContext context) => AddOrUpdateContactPage(),
-              );
-            } else if (pathElements[1] == "favourite_contact_list") {
-              return MaterialPageRoute<bool>(
-                settings: settings,
-                builder: (BuildContext context) => ContactListPage(
-                  showFav: true,
-                ),
-              );
-            }
-            return null;
-          },
+    return BlocProvider(
+      create: (_) => _contactBloc,
+      child: MaterialApp(
+        title: StringConstants.APP_NAME,
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+          visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
+        routes: {
+          RouteConstants.CONTACT_LIST_SCREEN: (BuildContext context) =>
+              ContactListPage(),
+        },
+        onGenerateRoute: (RouteSettings settings) =>
+            _buildGeneratedRoute(settings),
       ),
     );
+  }
+
+  ModalRoute _buildGeneratedRoute(RouteSettings settings) {
+    final List<String> pathElements =
+        settings.name.split(RouteConstants.CONTACT_LIST_SCREEN);
+    if (pathElements[0] != '') {
+      return null;
+    }
+    if (pathElements[1] ==
+        RouteConstants.ADD_CONTACT_SCREEN
+            .replaceAll(RouteConstants.CONTACT_LIST_SCREEN, '')) {
+      _contactBloc.initializeSelectedContact(list: []);
+      return MaterialPageRoute<bool>(
+        settings: settings,
+        builder: (BuildContext context) => AddOrUpdateContactPage(),
+      );
+    } else if (pathElements[1] ==
+        RouteConstants.UPDATE_CONTACT_SCREEN
+            .replaceAll(RouteConstants.CONTACT_LIST_SCREEN, '')) {
+      _contactBloc.initializeSelectedContact();
+      _contactBloc.state.selectedContact.id = int.parse(pathElements[2]);
+      return MaterialPageRoute<bool>(
+        settings: settings,
+        builder: (BuildContext context) => AddOrUpdateContactPage(),
+      );
+    } else if (pathElements[1] ==
+        RouteConstants.FAVOURITE_CONTACT_LIST_SCREEN
+            .replaceAll(RouteConstants.CONTACT_LIST_SCREEN, '')) {
+      return MaterialPageRoute<bool>(
+        settings: settings,
+        builder: (BuildContext context) => ContactListPage(
+          showFav: true,
+        ),
+      );
+    }
+    return null;
   }
 
   @override
   void dispose() {
     _contactBloc.close();
-    _homeBloc.close();
     super.dispose();
   }
 }

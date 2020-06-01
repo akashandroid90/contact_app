@@ -92,6 +92,7 @@ class AddOrUpdateContactPage extends StatelessWidget {
   Widget _buildNameField() {
     return TextFormField(
       initialValue: _contactBloc.state.selectedContact.name,
+      maxLength: 30,
       decoration: InputDecoration(
           labelText: StringConstants.NAME,
           filled: true,
@@ -137,6 +138,7 @@ class AddOrUpdateContactPage extends StatelessWidget {
   Widget _buildLabel(AppPhone phone) {
     return TextFormField(
       initialValue: phone.label,
+      maxLength: 10,
       decoration: InputDecoration(
           labelText: StringConstants.LABEL,
           filled: true,
@@ -192,11 +194,7 @@ class AddOrUpdateContactPage extends StatelessWidget {
                 children: <Widget>[
                   Expanded(
                     flex: 4,
-                    child: Container(
-                      margin: EdgeInsets.only(bottom: 20.0),
-                      child:
-                          _buildLabel(state.selectedContact.phoneList[index]),
-                    ),
+                    child: _buildLabel(state.selectedContact.phoneList[index]),
                   ),
                   SizedBox(
                     width: 10.0,

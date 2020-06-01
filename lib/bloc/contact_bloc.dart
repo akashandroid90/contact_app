@@ -16,18 +16,24 @@ class ContactBloc extends Bloc<int, ContactState> {
   Stream<ContactState> mapEventToState(event) async* {
     if (event == AppConstant.showLoader)
       yield ContactState(
-          showLoader: true, selectedContact: state.selectedContact);
+          contactList: state.contactList,
+          showLoader: true,
+          selectedContact: state.selectedContact);
     else if (event == AppConstant.showList)
       yield ContactState(
-          showLoader: false, selectedContact: state.selectedContact);
+          contactList: state.contactList,
+          showLoader: false,
+          selectedContact: state.selectedContact);
     else if (event == AppConstant.modifyContact)
       yield ContactState(
-          showLoader: state.showLoader, selectedContact: state.selectedContact);
+          contactList: state.contactList,
+          showLoader: false,
+          selectedContact: state.selectedContact);
     else if (event == AppConstant.modifyPhoneNumber)
-      state.selectedContact.phoneList =
-          List.from(state.selectedContact.phoneList);
-    yield ContactState(
-        showLoader: state.showLoader, selectedContact: state.selectedContact);
+      yield ContactState(
+          contactList: state.contactList,
+          showLoader: false,
+          selectedContact: state.selectedContact);
   }
 
   @override
@@ -67,10 +73,10 @@ class ContactBloc extends Bloc<int, ContactState> {
 
   //Database Operations
 
-  Future<List<AppContact>> fetchContacts(bool favourites) async {
+  Future<void> fetchContacts(bool favourites) async {
     add(AppConstant.showLoader);
     var value = await _appDatabase.fetchContacts(favourites).then((value) {
-//      if (value != null) state.contactList = value;
+      state.contactList = value;
       return value;
     }).catchError(onError);
     add(AppConstant.showList);
@@ -83,6 +89,7 @@ class ContactBloc extends Bloc<int, ContactState> {
             ? _appDatabase.insertContact(state.selectedContact)
             : _appDatabase.updateContact(state.selectedContact))
         .then((value) async {
+      fetchContacts(false);
       return value;
     }).catchError(onError);
     return value;
@@ -101,7 +108,7 @@ class ContactBloc extends Bloc<int, ContactState> {
       var list =
           await _appDatabase.fetchContactNumbers(state.selectedContact.id);
       state.selectedContact.phoneList = list;
-      add(AppConstant.modifyContact);
     }
+    add(AppConstant.modifyContact);
   }
 }

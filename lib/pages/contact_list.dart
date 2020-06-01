@@ -1,11 +1,9 @@
 import 'dart:io';
 
 import 'package:contactapp/bloc/contact_bloc.dart';
-import 'package:contactapp/bloc/home_bloc.dart';
 import 'package:contactapp/constants/app_constants.dart';
 import 'package:contactapp/model/app_contact.dart';
 import 'package:contactapp/state/contact_state.dart';
-import 'package:contactapp/state/home_state.dart';
 import 'package:contactapp/widget/screen_message.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -43,8 +41,8 @@ class ContactListPage extends StatelessWidget {
               ),
               trailing: contact.favorite ? Icon(Icons.favorite) : null,
               onTap: () => {
-                Navigator.pushNamed<bool>(
-                    context, "/update_contact/${contact.id}")
+                Navigator.pushNamed<bool>(context,
+                    RouteConstants.UPDATE_CONTACT_SCREEN + "/${contact.id}")
               },
             ),
           );
@@ -70,9 +68,12 @@ class ContactListPage extends StatelessWidget {
             child: FlatButton(
                 child: Text(StringConstants.All_CONTACTS),
                 onPressed: () => {
-                      print(ModalRoute.of(context).settings.name),
-                      Navigator.pushNamedAndRemoveUntil(
-                          context, "/", ModalRoute.withName('/')),
+                      if (ModalRoute.of(context).settings.name ==
+                          RouteConstants.CONTACT_LIST_SCREEN)
+                        {Navigator.pop(context)}
+                      else
+                        Navigator.pushNamed(
+                            context, RouteConstants.CONTACT_LIST_SCREEN),
                     }),
           ),
           Container(
@@ -81,7 +82,8 @@ class ContactListPage extends StatelessWidget {
                 child: Text(StringConstants.ADD_CONTACT),
                 onPressed: () => {
                       Navigator.pop(context),
-                      Navigator.pushNamed(context, "/add_contact"),
+                  Navigator.pushNamed(
+                      context, RouteConstants.ADD_CONTACT_SCREEN),
                     }),
           ),
           Container(
@@ -89,9 +91,15 @@ class ContactListPage extends StatelessWidget {
             child: FlatButton(
                 child: Text(StringConstants.FAVOURITE_CONTACTS),
                 onPressed: () => {
-                      print(ModalRoute.of(context).settings.name),
-                      Navigator.pushNamedAndRemoveUntil(context,
-                          "/favourite_contact_list", ModalRoute.withName('/')),
+                  if (ModalRoute
+                      .of(context)
+                      .settings
+                      .name ==
+                      RouteConstants.FAVOURITE_CONTACT_LIST_SCREEN)
+                    {Navigator.pop(context)}
+                  else
+                    Navigator.pushNamed(context,
+                        RouteConstants.FAVOURITE_CONTACT_LIST_SCREEN),
                     }),
           )
         ],
@@ -102,56 +110,49 @@ class ContactListPage extends StatelessWidget {
   Widget _buildAppBar(BuildContext context) {
     return AppBar(
       centerTitle: true,
-      title: BlocBuilder(
-          bloc: BlocProvider.of<HomeBloc>(context),
-          builder: (BuildContext context, HomeState state) {
-            return Text(showFav
-                ? StringConstants.FAVOURITE_CONTACTS
-                : StringConstants.CONTACT_LIST);
-          }),
+      title: Text(showFav
+          ? StringConstants.FAVOURITE_CONTACTS
+          : StringConstants.CONTACT_LIST),
     );
   }
 
   Widget _buildFloatingButton(BuildContext context) {
-    return BlocBuilder(
-        bloc: BlocProvider.of<HomeBloc>(context),
-        builder: (BuildContext context, HomeState state) {
-          return FloatingActionButton(
-            onPressed: () => Navigator.pushNamed(context, "/add_contact")
-                .then((value) => null),
-            tooltip: StringConstants.ADD_CONTACT,
-            child: Icon(Icons.add),
-          );
-        });
+    return FloatingActionButton(
+      onPressed: () =>
+          Navigator.pushNamed(context, RouteConstants.ADD_CONTACT_SCREEN)
+              .then((value) => null),
+      tooltip: StringConstants.ADD_CONTACT,
+      child: Icon(Icons.add),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     _contactBloc = BlocProvider.of<ContactBloc>(context);
+    _contactBloc.fetchContacts(showFav);
     return Scaffold(
       drawer: SafeArea(child: _buildSideDrawer(context)),
       appBar: _buildAppBar(context),
-      body: Stack(
-        children: <Widget>[
-          FutureBuilder<List<AppContact>>(
-              future: _contactBloc.fetchContacts(showFav),
-              builder: (BuildContext context,
-                  AsyncSnapshot<List<AppContact>> snapshot) {
-                if (snapshot.connectionState != ConnectionState.done) {
-                  return Center(
-                    child: CircularProgressIndicator(),
-                  );
-                } else {
-                  return snapshot.hasData
-                      ? snapshot.data.isEmpty
-                          ? _buildMessage()
-                          : _buildListView(snapshot.data)
-                      : _buildMessage();
-                }
-              }),
-        ],
+      body: BlocBuilder(
+        bloc: _contactBloc,
+        builder: (BuildContext context, ContactState state) {
+          return Stack(
+            children: <Widget>[
+              if (state.contactList == null || state.contactList.isEmpty)
+                _buildMessage()
+              else
+                _buildListView(state.contactList),
+              Visibility(
+                visible: state.showLoader,
+                child: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              )
+            ],
+          );
+        },
       ),
-      floatingActionButton: _buildFloatingButton(context),
+      floatingActionButton: showFav ? null : _buildFloatingButton(context),
     );
   }
 }
