@@ -10,6 +10,7 @@ class ScreenMessage extends StatelessWidget {
     return Center(
       child: Text(
         message,
+        textAlign: TextAlign.center,
         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0),
       ),
     );

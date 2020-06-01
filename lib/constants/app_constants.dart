@@ -28,6 +28,7 @@ class StringConstants {
   static const PLEASE_ENTER_NAME = "Please enter name";
   static const PLEASE_ENTER_LABEL = "Please enter label";
   static const PLEASE_ENTER_NUMBER = "Please enter number";
+  static const ADD_CONTACT_ADD_BUTTON = "Add Contact using\n 'Add' Button";
 }
 
 class AppConstant {

@@ -57,9 +57,7 @@ class ContactListPage extends StatelessWidget {
         builder: (BuildContext context, ContactState state) {
           return Visibility(
               visible: !state.showLoader,
-              child: ScreenMessage(showFav
-                  ? StringConstants.FAVOURITE_CONTACTS
-                  : StringConstants.CONTACT_LIST));
+              child: ScreenMessage(StringConstants.ADD_CONTACT_ADD_BUTTON));
         });
   }
 
@@ -72,6 +70,7 @@ class ContactListPage extends StatelessWidget {
             child: FlatButton(
                 child: Text(StringConstants.All_CONTACTS),
                 onPressed: () => {
+                      print(ModalRoute.of(context).settings.name),
                       Navigator.pushNamedAndRemoveUntil(
                           context, "/", ModalRoute.withName('/')),
                     }),
@@ -90,6 +89,7 @@ class ContactListPage extends StatelessWidget {
             child: FlatButton(
                 child: Text(StringConstants.FAVOURITE_CONTACTS),
                 onPressed: () => {
+                      print(ModalRoute.of(context).settings.name),
                       Navigator.pushNamedAndRemoveUntil(context,
                           "/favourite_contact_list", ModalRoute.withName('/')),
                     }),

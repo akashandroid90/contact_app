@@ -45,6 +45,7 @@ class _MyApp extends State<MyApp> {
             if (pathElements[1] == "add_contact") {
               _contactBloc.initializeSelectedContact(list: []);
               return MaterialPageRoute<bool>(
+                settings: settings,
                 builder: (BuildContext context) => AddOrUpdateContactPage(),
               );
             } else if (pathElements[1] == "update_contact") {
@@ -52,13 +53,12 @@ class _MyApp extends State<MyApp> {
               _contactBloc.state.selectedContact.id =
                   int.parse(pathElements[2]);
               return MaterialPageRoute<bool>(
+                settings: settings,
                 builder: (BuildContext context) => AddOrUpdateContactPage(),
               );
             } else if (pathElements[1] == "favourite_contact_list") {
-              _contactBloc.initializeSelectedContact();
-              _contactBloc.state.selectedContact.id =
-                  int.parse(pathElements[2]);
               return MaterialPageRoute<bool>(
+                settings: settings,
                 builder: (BuildContext context) => ContactListPage(
                   showFav: true,
                 ),
