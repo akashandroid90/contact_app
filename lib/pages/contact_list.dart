@@ -144,8 +144,8 @@ class ContactListPage extends StatelessWidget {
                 } else {
                   return snapshot.hasData
                       ? snapshot.data.isEmpty
-                      ? _buildMessage()
-                      : _buildListView(snapshot.data)
+                          ? _buildMessage()
+                          : _buildListView(snapshot.data)
                       : _buildMessage();
                 }
               }),
