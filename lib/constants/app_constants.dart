@@ -16,6 +16,17 @@ class StringConstants {
   static const UPDATE_CONTACT = "Update Contact";
   static const FAVOURITE_CONTACTS = "Favourite Contacts";
   static const CONTACT_LIST = "Contact List";
+  static const SAVE = "Save";
+  static const GALLERY = "Gallery";
+  static const CAMERA = "Camera";
+  static const LABEL = "LABEL";
+  static const NUMBER = "Number";
+  static const NAME = "Name";
+  static const FAVOURITE = "Favorite";
+  static const ADD_NUMBER = "Add Number";
+  static const PLEASE_ENTER_NAME = "Please enter name";
+  static const PLEASE_ENTER_LABEL = "Please enter label";
+  static const PLEASE_ENTER_NUMBER = "Please enter number";
 }
 
 class AppConstant {

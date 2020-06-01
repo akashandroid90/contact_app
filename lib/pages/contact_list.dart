@@ -53,9 +53,15 @@ class ContactListPage extends StatelessWidget {
   }
 
   Widget _buildMessage() {
-    return ScreenMessage(showFav
-        ? StringConstants.FAVOURITE_CONTACTS
-        : StringConstants.CONTACT_LIST);
+    return BlocBuilder(
+        bloc: _contactBloc,
+        builder: (BuildContext context, ContactState state) {
+          return Visibility(
+              visible: !state.showLoader,
+              child: ScreenMessage(showFav
+                  ? StringConstants.FAVOURITE_CONTACTS
+                  : StringConstants.CONTACT_LIST));
+        });
   }
 
   @override
@@ -69,8 +75,8 @@ class ContactListPage extends StatelessWidget {
                 AsyncSnapshot<List<AppContact>> snapshot) {
               return snapshot.hasData
                   ? snapshot.data.isEmpty
-                  ? _buildMessage()
-                  : _buildListView(snapshot.data)
+                      ? _buildMessage()
+                      : _buildListView(snapshot.data)
                   : _buildMessage();
             }),
         BlocBuilder(

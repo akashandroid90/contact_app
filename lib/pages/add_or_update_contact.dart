@@ -22,22 +22,28 @@ class AddOrUpdateContactPage extends StatelessWidget {
             height: 120,
             child: Column(
               children: <Widget>[
-                FlatButton(
-                    onPressed: () => _contactBloc
-                        .getImage(ImageSource.gallery)
-                        .then((value) => Navigator.pop(context)),
-                    child: Text(
-                      "Gallery",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    )),
-                FlatButton(
-                    onPressed: () => _contactBloc
-                        .getImage(ImageSource.camera)
-                        .then((value) => Navigator.pop(context)),
-                    child: Text(
-                      "Camera",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    )),
+                Container(
+                  width: double.infinity,
+                  child: FlatButton(
+                      onPressed: () => _contactBloc
+                          .getImage(ImageSource.gallery)
+                          .then((value) => Navigator.pop(context)),
+                      child: Text(
+                        StringConstants.GALLERY,
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      )),
+                ),
+                Container(
+                  width: double.infinity,
+                  child: FlatButton(
+                      onPressed: () => _contactBloc
+                          .getImage(ImageSource.camera)
+                          .then((value) => Navigator.pop(context)),
+                      child: Text(
+                        StringConstants.CAMERA,
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      )),
+                ),
               ],
             ),
           );
@@ -91,10 +97,12 @@ class AddOrUpdateContactPage extends StatelessWidget {
         return TextFormField(
           initialValue: _contactBloc.state.selectedContact.name,
           decoration: InputDecoration(
-              labelText: 'Name', filled: true, fillColor: Colors.white),
+              labelText: StringConstants.NAME,
+              filled: true,
+              fillColor: Colors.white),
           keyboardType: TextInputType.text,
           validator: (String value) {
-            return value.isEmpty ? "Please enter name" : null;
+            return value.isEmpty ? StringConstants.PLEASE_ENTER_NAME : null;
           },
           onSaved: (String value) {
             state.selectedContact.name = value;
@@ -114,7 +122,7 @@ class AddOrUpdateContactPage extends StatelessWidget {
               return SwitchListTile(
                 value: state.selectedContact.favorite,
                 onChanged: (bool value) => _contactBloc.changeFavourite(value),
-                title: Text('Favorite'),
+                title: Text(StringConstants.FAVOURITE),
               );
             },
           ),
@@ -123,7 +131,7 @@ class AddOrUpdateContactPage extends StatelessWidget {
           child: FlatButton(
             onPressed: _contactBloc.addPhoneNumber,
             child: Text(
-              "Add Number",
+              StringConstants.ADD_NUMBER,
               style: TextStyle(color: Colors.blue),
             ),
           ),
@@ -136,13 +144,15 @@ class AddOrUpdateContactPage extends StatelessWidget {
     return TextFormField(
       initialValue: phone.label,
       decoration: InputDecoration(
-          labelText: "Label", filled: true, fillColor: Colors.white),
+          labelText: StringConstants.LABEL,
+          filled: true,
+          fillColor: Colors.white),
       keyboardType: TextInputType.text,
       onSaved: ((String value) {
         phone.label = value;
       }),
       validator: (String value) {
-        return value.isEmpty ? "Please enter label" : null;
+        return value.isEmpty ? StringConstants.PLEASE_ENTER_LABEL : null;
       },
     );
   }
@@ -153,12 +163,14 @@ class AddOrUpdateContactPage extends StatelessWidget {
         maxLength: 14,
         keyboardType: TextInputType.phone,
         decoration: InputDecoration(
-            labelText: "Number", filled: true, fillColor: Colors.white),
+            labelText: StringConstants.NUMBER,
+            filled: true,
+            fillColor: Colors.white),
         onSaved: ((String value) {
           phone.number = value;
         }),
         validator: (String value) {
-          return value.isEmpty ? "Please enter number" : null;
+          return value.isEmpty ? StringConstants.PLEASE_ENTER_NUMBER : null;
         });
   }
 
@@ -235,9 +247,12 @@ class AddOrUpdateContactPage extends StatelessWidget {
                 height: 10.0,
               ),
               _buildPhoneNumber(),
-              RaisedButton(
-                  onPressed: () => _addOrUpdateContact(context),
-                  child: Text("Submit"))
+              Container(
+                width: double.infinity,
+                child: RaisedButton(
+                    onPressed: () => _addOrUpdateContact(context),
+                    child: Text(StringConstants.SAVE)),
+              )
             ],
           ),
         ),
