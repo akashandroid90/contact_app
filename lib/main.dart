@@ -30,8 +30,10 @@ class _MyApp extends State<MyApp> {
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
         routes: {
-          RouteConstants.CONTACT_LIST_SCREEN: (BuildContext context) =>
-              ContactListPage(),
+          RouteConstants.CONTACT_LIST_SCREEN: (BuildContext context) {
+            _contactBloc.state.showFav = false;
+            return ContactListPage();
+          },
         },
         onGenerateRoute: (RouteSettings settings) =>
             _buildGeneratedRoute(settings),
@@ -67,9 +69,10 @@ class _MyApp extends State<MyApp> {
             .replaceAll(RouteConstants.CONTACT_LIST_SCREEN, '')) {
       return MaterialPageRoute<bool>(
         settings: settings,
-        builder: (BuildContext context) => ContactListPage(
-          showFav: true,
-        ),
+        builder: (BuildContext context) {
+          _contactBloc.state.showFav = true;
+          return ContactListPage();
+        },
       );
     }
     return null;

@@ -9,10 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ContactListPage extends StatelessWidget {
-  final bool showFav;
   ContactBloc _contactBloc;
-
-  ContactListPage({this.showFav = false});
 
   Widget _buildListView(List<AppContact> contactList) {
     return ListView.builder(
@@ -82,8 +79,8 @@ class ContactListPage extends StatelessWidget {
                 child: Text(StringConstants.ADD_CONTACT),
                 onPressed: () => {
                       Navigator.pop(context),
-                  Navigator.pushNamed(
-                      context, RouteConstants.ADD_CONTACT_SCREEN),
+                      Navigator.pushNamed(
+                          context, RouteConstants.ADD_CONTACT_SCREEN),
                     }),
           ),
           Container(
@@ -110,7 +107,7 @@ class ContactListPage extends StatelessWidget {
   Widget _buildAppBar(BuildContext context) {
     return AppBar(
       centerTitle: true,
-      title: Text(showFav
+      title: Text(_contactBloc.state.showFav
           ? StringConstants.FAVOURITE_CONTACTS
           : StringConstants.CONTACT_LIST),
     );
@@ -129,7 +126,7 @@ class ContactListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     _contactBloc = BlocProvider.of<ContactBloc>(context);
-    _contactBloc.fetchContacts(showFav);
+    _contactBloc.fetchContacts();
     return Scaffold(
       drawer: SafeArea(child: _buildSideDrawer(context)),
       appBar: _buildAppBar(context),
@@ -152,7 +149,7 @@ class ContactListPage extends StatelessWidget {
           );
         },
       ),
-      floatingActionButton: showFav ? null : _buildFloatingButton(context),
+      floatingActionButton: _buildFloatingButton(context),
     );
   }
 }

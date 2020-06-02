@@ -16,21 +16,25 @@ class ContactBloc extends Bloc<int, ContactState> {
   Stream<ContactState> mapEventToState(event) async* {
     if (event == AppConstant.showLoader)
       yield ContactState(
+          showFav: state.showFav,
           contactList: state.contactList,
           showLoader: true,
           selectedContact: state.selectedContact);
     else if (event == AppConstant.showList)
       yield ContactState(
+          showFav: state.showFav,
           contactList: state.contactList,
           showLoader: false,
           selectedContact: state.selectedContact);
     else if (event == AppConstant.modifyContact)
       yield ContactState(
+          showFav: state.showFav,
           contactList: state.contactList,
           showLoader: false,
           selectedContact: state.selectedContact);
     else if (event == AppConstant.modifyPhoneNumber)
       yield ContactState(
+          showFav: state.showFav,
           contactList: state.contactList,
           showLoader: false,
           selectedContact: state.selectedContact);
@@ -75,9 +79,9 @@ class ContactBloc extends Bloc<int, ContactState> {
 
   //Database Operations
 
-  Future<void> fetchContacts(bool favourites) async {
+  Future<void> fetchContacts() async {
     add(AppConstant.showLoader);
-    var value = await _appDatabase.fetchContacts(favourites).then((value) {
+    var value = await _appDatabase.fetchContacts(state.showFav).then((value) {
       state.contactList = value;
       return value;
     }).catchError(onError);
@@ -88,7 +92,7 @@ class ContactBloc extends Bloc<int, ContactState> {
   Future<int> deleteContact() async {
     add(AppConstant.showLoader);
     var value = await _appDatabase.deleteContact(state.selectedContact.id);
-    fetchContacts(false);
+    fetchContacts();
     add(AppConstant.showList);
     return value;
   }
@@ -99,7 +103,7 @@ class ContactBloc extends Bloc<int, ContactState> {
             ? _appDatabase.insertContact(state.selectedContact)
             : _appDatabase.updateContact(state.selectedContact))
         .then((value) async {
-      fetchContacts(false);
+      fetchContacts();
       return value;
     }).catchError(onError);
     return value;

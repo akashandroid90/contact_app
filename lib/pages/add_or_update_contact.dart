@@ -211,10 +211,9 @@ class AddOrUpdateContactPage extends StatelessWidget {
               _contactBloc.state.selectedContact.id != null,
           child: Expanded(
             child: RaisedButton(
-                onPressed: () =>
-                    _contactBloc
-                        .deleteContact()
-                        .then((value) => Navigator.pop(context)),
+                onPressed: () => _contactBloc
+                    .deleteContact()
+                    .then((value) => Navigator.pop(context)),
                 child: Text(StringConstants.DELETE)),
           ),
         )
