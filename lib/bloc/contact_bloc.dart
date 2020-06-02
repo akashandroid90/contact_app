@@ -42,8 +42,10 @@ class ContactBloc extends Bloc<int, ContactState> {
   }
 
   void addPhoneNumber() {
-    state.selectedContact.phoneList.add(AppPhone());
-    add(AppConstant.modifyPhoneNumber);
+    if (state.selectedContact.phoneList.length < 5) {
+      state.selectedContact.phoneList.add(AppPhone());
+      add(AppConstant.modifyPhoneNumber);
+    }
   }
 
   void removePhoneNumber(int index) {
@@ -79,6 +81,14 @@ class ContactBloc extends Bloc<int, ContactState> {
       state.contactList = value;
       return value;
     }).catchError(onError);
+    add(AppConstant.showList);
+    return value;
+  }
+
+  Future<int> deleteContact() async {
+    add(AppConstant.showLoader);
+    var value = await _appDatabase.deleteContact(state.selectedContact.id);
+    fetchContacts(false);
     add(AppConstant.showList);
     return value;
   }

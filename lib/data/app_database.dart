@@ -94,4 +94,15 @@ class AppDatabase {
     });
     return value;
   }
+
+  Future<int> deleteContact(int columnId) async {
+    var value = await db.then((value) async {
+      return await value.delete(tblPhoneName,
+          where: colContactId + "=?", whereArgs: [columnId]).then((_) async {
+        return await value
+            .delete(tblName, where: colId + "=?", whereArgs: [columnId]);
+      });
+    });
+    return value;
+  }
 }

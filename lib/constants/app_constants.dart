@@ -17,6 +17,7 @@ class StringConstants {
   static const FAVOURITE_CONTACTS = "Favourite Contacts";
   static const CONTACT_LIST = "Contact List";
   static const SAVE = "Save";
+  static const DELETE = "Delete";
   static const GALLERY = "Gallery";
   static const CAMERA = "Camera";
   static const LABEL = "LABEL";

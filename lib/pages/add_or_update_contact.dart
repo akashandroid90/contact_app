@@ -36,11 +36,10 @@ class AddOrUpdateContactPage extends StatelessWidget {
                 Container(
                   width: double.infinity,
                   child: FlatButton(
-                      onPressed: () =>
-                      {
-                        Navigator.pop(context),
-                        _contactBloc.getImage(ImageSource.camera)
-                      },
+                      onPressed: () => {
+                            Navigator.pop(context),
+                            _contactBloc.getImage(ImageSource.camera)
+                          },
                       child: Text(
                         StringConstants.CAMERA,
                         style: TextStyle(fontWeight: FontWeight.bold),
@@ -107,34 +106,6 @@ class AddOrUpdateContactPage extends StatelessWidget {
       onSaved: (String value) {
         _contactBloc.state.selectedContact.name = value;
       },
-    );
-  }
-
-  Widget _buildAddFav() {
-    return Row(
-      children: <Widget>[
-        Expanded(
-          child: BlocBuilder(
-            bloc: _contactBloc,
-            builder: (BuildContext context, ContactState state) {
-              return SwitchListTile(
-                value: state.selectedContact.favorite,
-                onChanged: (bool value) => _contactBloc.changeFavourite(value),
-                title: Text(StringConstants.FAVOURITE),
-              );
-            },
-          ),
-        ),
-        Expanded(
-          child: FlatButton(
-            onPressed: _contactBloc.addPhoneNumber,
-            child: Text(
-              StringConstants.ADD_NUMBER,
-              style: TextStyle(color: Colors.blue),
-            ),
-          ),
-        ),
-      ],
     );
   }
 
@@ -219,6 +190,38 @@ class AddOrUpdateContactPage extends StatelessWidget {
     );
   }
 
+  Widget _buildSubmitDeleteButtons(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: <Widget>[
+        Expanded(
+          child: RaisedButton(
+              onPressed: () => _addOrUpdateContact(context),
+              child: Text(StringConstants.SAVE)),
+        ),
+        Visibility(
+          visible: _contactBloc.state.selectedContact != null &&
+              _contactBloc.state.selectedContact.id != null,
+          child: SizedBox(
+            width: 10.0,
+          ),
+        ),
+        Visibility(
+          visible: _contactBloc.state.selectedContact != null &&
+              _contactBloc.state.selectedContact.id != null,
+          child: Expanded(
+            child: RaisedButton(
+                onPressed: () =>
+                    _contactBloc
+                        .deleteContact()
+                        .then((value) => Navigator.pop(context)),
+                child: Text(StringConstants.DELETE)),
+          ),
+        )
+      ],
+    );
+  }
+
   Widget _buildBodyUi(BuildContext context) {
     return Padding(
       padding: EdgeInsets.all(10.0),
@@ -233,20 +236,37 @@ class AddOrUpdateContactPage extends StatelessWidget {
                 height: 10.0,
               ),
               _buildNameField(),
-              SizedBox(
-                height: 10.0,
+              BlocBuilder(
+                bloc: _contactBloc,
+                builder: (BuildContext context, ContactState state) {
+                  return SwitchListTile(
+                    value: state.selectedContact.favorite,
+                    onChanged: (bool value) =>
+                        _contactBloc.changeFavourite(value),
+                    title: Text(StringConstants.FAVOURITE),
+                  );
+                },
               ),
-              _buildAddFav(),
-              SizedBox(
-                height: 10.0,
+              BlocBuilder(
+                bloc: _contactBloc,
+                builder: (BuildContext context, ContactState state) {
+                  if (state.selectedContact.phoneList.length < 5)
+                    return Align(
+                      alignment: Alignment.centerRight,
+                      child: FlatButton(
+                        onPressed: _contactBloc.addPhoneNumber,
+                        child: Text(
+                          StringConstants.ADD_NUMBER,
+                          style: TextStyle(color: Colors.blue),
+                        ),
+                      ),
+                    );
+                  else
+                    return Container();
+                },
               ),
               _buildPhoneNumber(),
-              Container(
-                width: double.infinity,
-                child: RaisedButton(
-                    onPressed: () => _addOrUpdateContact(context),
-                    child: Text(StringConstants.SAVE)),
-              )
+              _buildSubmitDeleteButtons(context),
             ],
           ),
         ),
