@@ -88,15 +88,12 @@ class ContactListPage extends StatelessWidget {
             child: FlatButton(
                 child: Text(StringConstants.FAVOURITE_CONTACTS),
                 onPressed: () => {
-                  if (ModalRoute
-                      .of(context)
-                      .settings
-                      .name ==
-                      RouteConstants.FAVOURITE_CONTACT_LIST_SCREEN)
-                    {Navigator.pop(context)}
-                  else
-                    Navigator.pushNamed(context,
-                        RouteConstants.FAVOURITE_CONTACT_LIST_SCREEN),
+                      if (ModalRoute.of(context).settings.name ==
+                          RouteConstants.FAVOURITE_CONTACT_LIST_SCREEN)
+                        {Navigator.pop(context)}
+                      else
+                        Navigator.pushNamed(context,
+                            RouteConstants.FAVOURITE_CONTACT_LIST_SCREEN),
                     }),
           )
         ],

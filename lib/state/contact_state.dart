@@ -7,8 +7,9 @@ class ContactState {
   bool showFav;
   AppContact selectedContact;
 
-  ContactState({this.showFav = false,
-    this.showLoader = false,
+  ContactState(
+      {this.showFav = false,
+      this.showLoader = false,
       this.contactList,
       this.contactId = -1,
       this.selectedContact});
